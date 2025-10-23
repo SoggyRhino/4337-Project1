@@ -25,7 +25,7 @@
                      (join (rest lst) (cons (string (first lst)) acc) "" 0)]
                 [(space? (first lst))
                      (join (rest lst) acc   "" 0)]
-                [(or (num? (first lst)) (dollar? (first lst)))
+                [(or (digit? (first lst)) (dollar? (first lst)))
                     (join (rest lst)  acc   (string(first lst)) 1)]
                 [else
                     (cons #f (format "Unknown character ~s" (first lst)))]
@@ -39,7 +39,7 @@
                  ; if the current char is an " " then we know the number is over
                  [(space? (first lst))
                     (join (rest lst) (cons lastTokens acc) "" 0)]
-                 [(num? (first lst))
+                 [(digit? (first lst))
                     (join (rest lst) acc (string-append lastTokens (string(first lst))) 1)]
                  [(dollar? (first lst))
                     (join (rest lst)    (cons lastTokens acc) (string(first lst)) 1)]
@@ -56,8 +56,26 @@
 (define (op? c)
     (member c '(#\+ #\- #\* #\/)))
 
-(define (num? c)
+(define (digit? c)
     (member c '(#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 )))
+
+
+
+(define (pre-process lst history acc)
+    (cond
+        [(empty? lst) (reverse acc)]
+        [(equal? "-" (first lst)
+            (pre-process (rest lst) history (cons ("*" "-1")) acc))]
+        [(char=? #\$ (first (string->list (first lst))))
+            (define (ref) (string->number (rest (string->list (first lst)))))
+            (pre-process (rest lst) history (cons (get-n ref lst 0) acc))]
+        [else
+            (pre-process (rest lst) history (cons (first lst) acc))]))
+
+(define (get-n n lst i)
+    (if (= n i)
+        (first lst)
+        (get-n n (rest lst) (+ i 1))))
 
 (define (evaluate lst)
   (cond
@@ -98,7 +116,7 @@
      (right-helper (rest lst) (- need 1))]))
 
 
-;;;; tests
+;;;; tests 
 (define (test-eval str expected)
   (define result (evaluate (tokenize str)))
   (if (= result expected)

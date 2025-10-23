@@ -62,3 +62,26 @@ arguments which somewhat defeats the point of functional programming.
      - Complete the eval function with the new approach 
        - (get left "tree" ) (operation) (get right "tree") 
          - recursively evaluate this on each tree until we hit numbers 
+
+
+
+(October 23 3:15)
+
+Eval was complete, it was much more conducive to the language. I added some tests to make sure it was working
+I will probably need add some more as I add more functions. 
+
+I made a pre-process function in order to make all expressions into the form that is expected by the evlauation function.
+    - Replace unary operators with * -1, this avoids having to make the eval more complex and handle single operand operators
+    - Replace $n with correct value from history.
+
+
+I have done most of the hard parts now it is just working on the User input. After that is done I will need to go back throough 
+and add/fix how errors are handle. This probably will have to be done in conjunction with adding ui.
+
+Next session I will work on a function that will evaluate an expression from a string it will :
+ - Tokenize string (handle error)
+ - Preprocess string (handle error)
+ - Evaluate (handle error)
+ - Return #t/#f, msg/value
+
+Also the code is just random as i work on things i will clean it up later
