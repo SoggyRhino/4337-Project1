@@ -38,5 +38,27 @@ since im going to skip the $ references for now (just hard coded $2 -> 2 etc)
 (October 23 7 am)
 
  - Thoughts
-    - I was thinking about whether I could directly replace '-' with "* -1" this would make evaluating easier
-      as - is a weird case since it only takes in 1 operation
+    - I was thinking about whether I could directly replace '-' with "*" "-1" this would make evaluating easier
+      as - is a weird case since it only takes in 1 operation.
+ - Plan to accomplish 
+   - Complete the eval function (ignoring the - for now)
+   - Create a placeholder preprocessing function for replacing $n 
+
+
+(October 23 9 am)
+
+I made decent progress on the eval function but I think my approach is completely wrong and introduces to many edge cases
+The problem is that I am essentially using an imperative approach, but I am just storing the state in the 
+arguments which somewhat defeats the point of functional programming.
+
+
+(October 23 3:15)
+ - Thoughts 
+   - I've looked over the instructions again and have seen the hint about using a function that returns 2 lists. I think
+     I am going to implement this approach as it looks more straight forward.
+   - More of a future thought but originally i didn't realize that a map would be somewhat obnoxious to implement 
+     so for the $n replacement im just going to embed the whole equation. performance shouldn't really be an issue.
+   - Plan to accomplish 
+     - Complete the eval function with the new approach 
+       - (get left "tree" ) (operation) (get right "tree") 
+         - recursively evaluate this on each tree until we hit numbers 

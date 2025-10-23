@@ -59,29 +59,54 @@
 (define (num? c)
     (member c '(#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 )))
 
-
-
 (define (evaluate lst)
-     (evaluate lst '() #f #f))
+  (cond
+    [(empty? lst) 0]
+    [(equal? (first lst) "+")
+     (+ (evaluate (left (rest lst)))
+        (evaluate (right (rest lst))))]
+    [(equal? (first lst) "*")
+     (* (evaluate (left (rest lst)))
+        (evaluate (right (rest lst))))]
+    [(equal? (first lst) "/")
+     (/ (evaluate (left (rest lst)))
+        (evaluate (right (rest lst))))]
+    [else (string->number (first lst))]))
 
-(define (evaluate-acc lst ops a b)
-     (cond
-        [(empty? list)
-            (cond
-                [(not a) (cons #f "Invalid Expression")]
-                [(not (empty? ops)) (cons #f "Invalid Expression")]
-                [else a]
-            )]
-        [(op? (first lst) )
-            (evaluate-acc (rest lst) (cons (first lst) acc) a b)]
-        [(string->number (first lst))
-            (if (a)
-                (if (eqaul? "-" (first ops))
-                    (evaluate-acc (rest lst) (rest ops) (* -1 a) #f)
-                    (if (b)
-                         (evaluate-acc (rest lst) (rest ops) (op (first ops) a b) #f)
-                         (evaluate-acc (rest lst) (rest ops) a (string->number (first lst)))))
-                (evaluate-acc (rest lst) (rest ops) (string->number (first lst)) #f))]
-        [else (cons #f (format "Invalid Expression, Unkonwn input ~s" (first lst)))]
-     )
-)
+(define (left lst)
+  (left-helper lst 1 '()))
+
+(define (left-helper lst need acc)
+  (cond
+    [(zero? need) (reverse acc)]
+    [(empty? lst) (reverse acc)]
+    [(member (first lst) '("+" "*" "/"))
+     (left-helper (rest lst) (+ need 1) (cons (first lst) acc))]
+    [else
+     (left-helper (rest lst) (- need 1) (cons (first lst) acc))]))
+
+(define (right lst)
+  (right-helper lst 1))
+
+(define (right-helper lst need)
+  (cond
+    [(zero? need) lst]
+    [(empty? lst) lst]
+    [(member (first lst) '("+" "*" "/"))
+     (right-helper (rest lst) (+ need 1))]
+    [else
+     (right-helper (rest lst) (- need 1))]))
+
+
+;;;; tests
+(define (test-eval str expected)
+  (define result (evaluate (tokenize str)))
+  (if (= result expected)
+      (displayln (format "Test Passed: ~s = ~s" str result))
+      (displayln (format "Test Failed: ~s → got ~s but expected ~s"
+                         str result expected))))
+
+(test-eval "* * 1 2 2" 4)
+(test-eval "+ + 1 1 + 1 1" 4)
+(test-eval "+ * 5 2 + 1 1" 12)
+(test-eval "+ 1 2" 3)
