@@ -58,3 +58,30 @@
 
 (define (num? c)
     (member c '(#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 )))
+
+
+
+(define (evaluate lst)
+     (evaluate lst '() #f #f))
+
+(define (evaluate-acc lst ops a b)
+     (cond
+        [(empty? list)
+            (cond
+                [(not a) (cons #f "Invalid Expression")]
+                [(not (empty? ops)) (cons #f "Invalid Expression")]
+                [else a]
+            )]
+        [(op? (first lst) )
+            (evaluate-acc (rest lst) (cons (first lst) acc) a b)]
+        [(string->number (first lst))
+            (if (a)
+                (if (eqaul? "-" (first ops))
+                    (evaluate-acc (rest lst) (rest ops) (* -1 a) #f)
+                    (if (b)
+                         (evaluate-acc (rest lst) (rest ops) (op (first ops) a b) #f)
+                         (evaluate-acc (rest lst) (rest ops) a (string->number (first lst)))))
+                (evaluate-acc (rest lst) (rest ops) (string->number (first lst)) #f))]
+        [else (cons #f (format "Invalid Expression, Unkonwn input ~s" (first lst)))]
+     )
+)

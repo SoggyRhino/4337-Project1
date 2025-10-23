@@ -32,3 +32,11 @@ is going to work.
 
 Next session is to work on a basic implemntation of the calculator. It shouldn't be too bad
 since im going to skip the $ references for now (just hard coded $2 -> 2 etc)
+
+
+
+(October 23 7 am)
+
+ - Thoughts
+    - I was thinking about whether I could directly replace '-' with "* -1" this would make evaluating easier
+      as - is a weird case since it only takes in 1 operation
