@@ -47,7 +47,6 @@
      (join (string->list str) '() "" 0))
 
 (define (join lst acc lastTokens lastType)
-
     (cond
         ; handle end of list
         [(empty? lst)
@@ -82,8 +81,7 @@
                  [(dollar? token)
                     (join (rest lst) (cons lastTokens acc) (string token) 1)]
                  [else
-                    (cons #f (format "Unknown character ~s" token))]
-            )]))
+                    (cons #f (format "Unknown character ~s" token))])]))
 
 (define (dollar? c)
   (char=? c #\$))

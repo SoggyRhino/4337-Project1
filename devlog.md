@@ -138,6 +138,9 @@ Future plans
      handle carriage returns and newlines
 
 
-### (October 24 11am)
+### (October 24 5 pm)
 
-Project is now pretty much complete, besides final clean up all that remains is 
+Completed the project. Cleaned up the code, and made some minor changes to better match the project instructions. 
+
+Completed the README.md 
+
