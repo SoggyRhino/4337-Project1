@@ -92,11 +92,30 @@ Also the code is just random as i work on things i will clean it up later
 - Thoughts
   - I've decided that we should just have 2 different functions for each of the modes. WHile 
     this will result in some duplicated code, it doesnt really matter 
-    - For now the plan is to have prompt run iether interactive or batch
+    - For now the plan is to have prompt run either interactive or batch
     - Each of those functions will just loop and have history passed as an argument
-      - 2 seperate lists, 1 for history input and 1 for output
+      - 2 separate lists, 1 for history input and 1 for output
 - Plan  to accomplish 
   - The function to evaluate mentioned in last log 
-  - finalize error handling for tokenizer, evlauate, and pre-process 
+  - finalize error handling for tokenizer, evaluate, and pre-process 
   - Possibly work on the user input handler
 
+### (October 23 4am)
+    
+During the last several hours I have made significant progress towards the completion of the project. I have 
+completed the evaluate function that handles errors and injects history.
+
+I updated the error handling in tokenize, pre-process, and evaluate. 
+
+Enhanced evaluate to catch more invalid expressions that is was letting through before (+ 2 2 2 is invalid 
+but it was ignoring the trailing numbers)
+
+Changed evaluate to now use floating point numbers. 
+
+Completed the interactive and batch mode functions. 
+
+Future plans 
+ - Create a "main" function that runs interative or batch based on flags 
+ - Clean up the output to match what is expected in the instructions 
+ - Clean up the code, reorder fix comments 
+ - Work on a read me
