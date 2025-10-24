@@ -35,6 +35,20 @@
         (print-history (rest input-history) (rest value-history) (+ 1 i)))
       (displayln "")))
 
+(define (batch input-history value-history i)
+(begin
+        (let [(expression (read-line))]
+            (if (equal? "quit" expression)
+                #t
+                (let [(result (exc-expr expression value-history))]
+                   (if (car result)
+                       (begin
+                          (displayln (format "~s = ~s" expression (number->string (cdr result))))
+                          (batch (append input-history (list expression)) (append value-history (list (number->string (cdr result)))) i))
+                       (begin
+                            (displayln (cdr result))
+                            (batch input-history value-history i))))))))
+
 
 (define (exc-expr str value-history)
   (define tokenized (tokenize str))
@@ -133,7 +147,7 @@
       [(empty? lst) #f]
       [(string->number (first lst))
        (if (empty? (rest lst))
-         (string->number (first lst))
+         (real->double-flonum (string->number (first lst)))
          #f)]
       [else
             (let* ([left (evaluate (left (rest lst)))]
