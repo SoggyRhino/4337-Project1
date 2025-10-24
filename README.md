@@ -1,7 +1,5 @@
 # 4337 - Project 1: Prefix expression evaluator 
 
----
-
 ## Running the Program 
 
 You can run the program with the following command (assuming you have racket installed)
