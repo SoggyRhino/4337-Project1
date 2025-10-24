@@ -111,10 +111,10 @@ Error: $n is out of bounds
 
 ```
 C:\Users\name\IdeaProjects\4337-Project1>racket mode.rkt
+Enter a prefix expression: / 1 6
+1: 0.0
 Enter a prefix expression: + * 2 3 / 8 4
-1: 8.0
-Enter a prefix expression: + $1 3
-2: 11.0
+2: 8.0
 Enter a prefix expression: quit
 Quitting program
 ```
