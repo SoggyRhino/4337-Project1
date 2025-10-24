@@ -7,6 +7,35 @@
        [(string=? (vector-ref args 0) "--batch") #f]
        [else #t])))
 
+
+(define (interactive input-history value-history)
+    (begin
+        (print-history input-history value-history 1)
+        (displayln "Enter a prefix expression")
+        (let [(expression (read-line))]
+            (if (equal? "quit" expression)
+                (displayln "Quitting program")
+                (let [(result (exc-expr expression value-history))]
+                   (if (car result)
+                       (begin
+                          (displayln (format "~s = ~s" expression (number->string (cdr result))))
+                          (interactive (append input-history (list expression)) (append value-history (list (number->string (cdr result))))))
+                       (begin
+                            (displayln (cdr result))
+                            (interactive input-history value-history))))))))
+
+
+(define (print-history input-history value-history i)
+  (if (not (empty? input-history))
+      (begin
+        (if (= 1 i)
+            (displayln "\n++++++++++++ History ++++++++++++")
+            #f)
+        (displayln (format "$~s  | ~s = ~s" i (first input-history) (first value-history)))
+        (print-history (rest input-history) (rest value-history) (+ 1 i)))
+      (displayln "")))
+
+
 (define (exc-expr str value-history)
   (define tokenized (tokenize str))
   (define token-success (car tokenized))
@@ -15,10 +44,10 @@
       (let ([processed-tokens (pre-process tokens value-history '())])
         (if processed-tokens
             (let ([result (evaluate processed-tokens)])
-              (if result
+              (if result ;todo fix error
                   (cons #t result)
                   (cons #f (format "Result: ~s" result))))
-            (cons #f "Invalid Expression: $n is out of bounds")))
+            (cons #f "Error: $n is out of bounds")))
       (cons #f (format "Error: ~s" tokens))))
 
 
@@ -138,4 +167,4 @@
      (right-helper (rest lst) (- need 1))]))
 
 
-(exc-expr "+ $1 $2" '("4" "5")  )
+(interactive '() '())
