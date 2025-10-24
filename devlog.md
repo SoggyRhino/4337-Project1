@@ -136,3 +136,8 @@ Future plans
    - Main was very simple to implement just if prompt?
    - I was running everything in dr racket, and it was working fine but cmd gives different values on input, now i need to 
      handle carriage returns and newlines
+
+
+### (October 24 11am)
+
+Project is now pretty much complete, besides final clean up all that remains is 

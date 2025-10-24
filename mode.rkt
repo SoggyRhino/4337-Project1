@@ -9,71 +9,45 @@
        [(string=? (vector-ref args 0) "--batch") #f]
        [else #t])))
 
-(define (main)
-    (if prompt?
-        (interactive '() '())
-        (batch '() '() 1)))
-
-(define (interactive input-history value-history)
+(define (run value-history i)
     (begin
-        (print-history input-history value-history 1)
-        (display "Enter a prefix expression: ")
+        (when prompt?
+                (display "Enter a prefix expression: "))
         (let [(expression (string-trim  (read-line)))]
             (if (equal? "quit" expression)
-                (displayln "Quitting program")
-                (let [(result (exc-expr expression value-history))]
+            (when prompt?
+                (displayln "Quitting program"))
+                (let [(result (exc-expr expression (reverse value-history)))]
                    (if (car result)
                        (begin
-                          (displayln (format "~s = ~s" expression (number->string (cdr result))))
-                          (interactive (append input-history (list expression)) (append value-history (list (number->string (cdr result))))))
+                          (display i)
+                          (display ": ")
+                          (displayln (real->double-flonum (cdr result)))
+                          (run (cons (number->string (cdr result)) value-history ) (+ i 1)))
                        (begin
                             (displayln (cdr result))
-                            (interactive input-history value-history))))))))
-
-
-(define (print-history input-history value-history i)
-  (if (not (empty? input-history))
-      (begin
-        (if (= 1 i)
-            (displayln "\n++++++++++++ History ++++++++++++")
-            #f)
-        (displayln (format "$~s  | ~s = ~s" i (first input-history) (first value-history)))
-        (print-history (rest input-history) (rest value-history) (+ 1 i)))
-      (displayln "")))
-
-(define (batch input-history value-history i)
-(begin
-        (let [(expression (string-trim (read-line)))]
-            (if (equal? "quit" expression)
-                #t
-                (let [(result (exc-expr expression value-history))]
-                   (if (car result)
-                       (begin
-                          (displayln (format "~s = ~s" expression (number->string (cdr result))))
-                          (batch (append input-history (list expression)) (append value-history (list (number->string (cdr result)))) i))
-                       (begin
-                            (displayln (cdr result))
-                            (batch input-history value-history i))))))))
-
+                            (run value-history i))))))))
 
 (define (exc-expr str value-history)
-  (define tokenized (tokenize str))
-  (define token-success (car tokenized))
-  (define tokens (cdr tokenized))
-  (if token-success
-      (let ([processed-tokens (pre-process tokens value-history '())])
-        (if processed-tokens
-            (let ([result (evaluate processed-tokens)])
-              (if result ;todo fix error
-                  (cons #t result)
-                  (cons #f "Error: Invalid Expression")))
-            (cons #f "Error: $n is out of bounds")))
-      (cons #f (format "Error: ~s" tokens))))
+  (let [(tokenized (tokenize str))]
+    (define token-success (car tokenized))
+    (define tokens (cdr tokenized))
+    (if token-success
+        (let ([processed-tokens (pre-process tokens value-history '())])
+          (if processed-tokens
+              (let ([result (evaluate processed-tokens)])
+                (if result
+                    (cons #t result)
+                    (cons #f "Error: Invalid Expression")))
+              (cons #f "Error: $n is out of bounds")))
+        (cons #f (format "Error: ~a" tokens)))))
+
 
 (define (tokenize str )
      (join (string->list str) '() "" 0))
 
 (define (join lst acc lastTokens lastType)
+
     (cond
         ; handle end of list
         [(empty? lst)
@@ -82,31 +56,33 @@
                 (cons #t (reverse acc)))]
         ; handle case where we don't need to include precding tokens
         [(= 0 lastType)
+            (define token (first lst))
             (cond
-                [(op? (first lst))
-                     (join (rest lst) (cons (string (first lst)) acc) "" 0)]
-                [(char-whitespace? (first lst))
+                [(op? token)
+                     (join (rest lst) (cons (string token) acc) "" 0)]
+                [(char-whitespace? token)
                      (join (rest lst) acc   "" 0)]
-                [(or (digit? (first lst)) (dollar? (first lst)))
-                    (join (rest lst)  acc   (string(first lst)) 1)]
+                [(or (digit? token) (dollar? token))
+                    (join (rest lst)  acc   (string token) 1)]
                 [else
-                    (cons #f (format "Unknown character ~s" (first lst)))]
+                    (cons #f (format "Unknown character ~a" token))]
             )]
         ; handle cases when we need to include the previous chars
         [(= 1 lastType)
+            (define token (first lst))
             (cond
                  ; if the current char is an operator then we know the number is over
-                 [(op? (first lst))
-                    (join (rest lst) (cons (string (first lst)) (cons lastTokens acc)) "" 0)]
+                 [(op? token)
+                    (join (rest lst) (cons (string token) (cons lastTokens acc)) "" 0)]
                  ; if the current char is an " " then we know the number is over
-                 [(char-whitespace? (first lst))
+                 [(char-whitespace? token)
                     (join (rest lst) (cons lastTokens acc) "" 0)]
-                 [(digit? (first lst))
-                    (join (rest lst) acc (string-append lastTokens (string(first lst))) 1)]
-                 [(dollar? (first lst))
-                    (join (rest lst)    (cons lastTokens acc) (string(first lst)) 1)]
+                 [(digit? token)
+                    (join (rest lst) acc (string-append lastTokens (string token)) 1)]
+                 [(dollar? token)
+                    (join (rest lst) (cons lastTokens acc) (string token) 1)]
                  [else
-                    (cons #f (format "Unknown character ~s" (first lst)))]
+                    (cons #f (format "Unknown character ~s" token))]
             )]))
 
 (define (dollar? c)
@@ -120,8 +96,6 @@
 
 (define (digit? c)
     (member c '(#\0 #\1 #\2 #\3 #\4 #\5 #\6 #\7 #\8 #\9 )))
-
-
 
 (define (pre-process lst history acc)
     (cond
@@ -187,4 +161,4 @@
             (right-helper (rest lst) (- need 1))]))
 
 
-(main)
+(run '() 1)
