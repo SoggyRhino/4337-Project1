@@ -7,17 +7,33 @@
        [(string=? (vector-ref args 0) "--batch") #f]
        [else #t])))
 
+(define (exc-expr str value-history)
+  (define tokenized (tokenize str))
+  (define token-success (car tokenized))
+  (define tokens (cdr tokenized))
+  (if token-success
+      (let ([processed-tokens (pre-process tokens value-history '())])
+        (if processed-tokens
+            (let ([result (evaluate processed-tokens)])
+              (if result
+                  (cons #t result)
+                  (cons #f (format "Result: ~s" result))))
+            (cons #f "Invalid Expression: $n is out of bounds")))
+      (cons #f (format "Error: ~s" tokens))))
+
+
+
 
 (define (tokenize str )
-     (reverse (cdr (join (string->list str) '() "" 0))))
+     (join (string->list str) '() "" 0))
 
 (define (join lst acc lastTokens lastType)
     (cond
         ; handle end of list
         [(empty? lst)
             (if (= 1 lastType)
-                (cons #t (cons lastTokens acc))
-                (cons #t acc))]
+                (cons #t (reverse (cons lastTokens acc)))
+                (cons #t (reverse acc)))]
         ; handle case where we don't need to include precding tokens
         [(= 0 lastType)
             (cond
@@ -64,18 +80,24 @@
 (define (pre-process lst history acc)
     (cond
         [(empty? lst) (reverse acc)]
-        [(equal? "-" (first lst)
-            (pre-process (rest lst) history (cons ("*" "-1")) acc))]
+        [(equal? "-" (first lst))
+            (pre-process (rest lst) history (cons "-1" (cons "*" acc)))]
         [(char=? #\$ (first (string->list (first lst))))
-            (define (ref) (string->number (rest (string->list (first lst)))))
-            (pre-process (rest lst) history (cons (get-n ref lst 0) acc))]
+            (define index (string->number (list->string (rest (string->list (first lst))))))
+            (let ([res (get-n index history 1)])
+            (if res
+                (pre-process (rest lst) history (cons res acc))
+                 #f ))]; no need to pass a string as this is the only type of error
         [else
             (pre-process (rest lst) history (cons (first lst) acc))]))
 
+
+; make sure that history is stored as a list of strings
 (define (get-n n lst i)
-    (if (= n i)
-        (first lst)
-        (get-n n (rest lst) (+ i 1))))
+    (cond
+        [(empty? lst) #f] ; no need to pass a string as this is the only type of error
+        [(= n i) (first lst) ]
+        [else (get-n n (rest lst) (+ i 1))]))
 
 (define (evaluate lst)
   (cond
@@ -116,15 +138,4 @@
      (right-helper (rest lst) (- need 1))]))
 
 
-;;;; tests 
-(define (test-eval str expected)
-  (define result (evaluate (tokenize str)))
-  (if (= result expected)
-      (displayln (format "Test Passed: ~s = ~s" str result))
-      (displayln (format "Test Failed: ~s → got ~s but expected ~s"
-                         str result expected))))
-
-(test-eval "* * 1 2 2" 4)
-(test-eval "+ + 1 1 + 1 1" 4)
-(test-eval "+ * 5 2 + 1 1" 12)
-(test-eval "+ 1 2" 3)
+(exc-expr "+ $1 $2" '("4" "5")  )

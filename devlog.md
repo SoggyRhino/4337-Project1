@@ -1,4 +1,4 @@
-(October 22 11pm)
+### (October 22 11pm)
  - Thoughts 
    - The project looks like more effort than I had originally thought, 
      need to get started asap
@@ -13,9 +13,9 @@
    - Next session will tackle 
      - Replacing references with past values (simulated for now)
      - Get started on the function to actually evaluate expressions
-   
 
-(October 23 12:13pm)
+
+### (October 23 12:13pm)
    
 Writing the Tokenizing function was not too difficult. The function was not 
 very complex, all it was doing was deciding whether or not to join/ add or skip
@@ -35,7 +35,7 @@ since im going to skip the $ references for now (just hard coded $2 -> 2 etc)
 
 
 
-(October 23 7 am)
+### (October 23 7 am)
 
  - Thoughts
     - I was thinking about whether I could directly replace '-' with "*" "-1" this would make evaluating easier
@@ -45,27 +45,27 @@ since im going to skip the $ references for now (just hard coded $2 -> 2 etc)
    - Create a placeholder preprocessing function for replacing $n 
 
 
-(October 23 9 am)
+###  (October 23 9 am)
 
 I made decent progress on the eval function but I think my approach is completely wrong and introduces to many edge cases
 The problem is that I am essentially using an imperative approach, but I am just storing the state in the 
 arguments which somewhat defeats the point of functional programming.
 
 
-(October 23 3:15)
+###  (October 23 3:15 pm)
  - Thoughts 
    - I've looked over the instructions again and have seen the hint about using a function that returns 2 lists. I think
      I am going to implement this approach as it looks more straight forward.
    - More of a future thought but originally i didn't realize that a map would be somewhat obnoxious to implement 
      so for the $n replacement im just going to embed the whole equation. performance shouldn't really be an issue.
-   - Plan to accomplish 
-     - Complete the eval function with the new approach 
-       - (get left "tree" ) (operation) (get right "tree") 
-         - recursively evaluate this on each tree until we hit numbers 
+ - Plan to accomplish 
+   - Complete the eval function with the new approach 
+     - (get left "tree" ) (operation) (get right "tree") 
+       - recursively evaluate this on each tree until we hit numbers 
 
 
 
-(October 23 3:15)
+###  (October 23 4:24 pm)
 
 Eval was complete, it was much more conducive to the language. I added some tests to make sure it was working
 I will probably need add some more as I add more functions. 
@@ -85,3 +85,18 @@ Next session I will work on a function that will evaluate an expression from a s
  - Return #t/#f, msg/value
 
 Also the code is just random as i work on things i will clean it up later
+
+
+### (October 23 10pm)
+
+- Thoughts
+  - I've decided that we should just have 2 different functions for each of the modes. WHile 
+    this will result in some duplicated code, it doesnt really matter 
+    - For now the plan is to have prompt run iether interactive or batch
+    - Each of those functions will just loop and have history passed as an argument
+      - 2 seperate lists, 1 for history input and 1 for output
+- Plan  to accomplish 
+  - The function to evaluate mentioned in last log 
+  - finalize error handling for tokenizer, evlauate, and pre-process 
+  - Possibly work on the user input handler
+
