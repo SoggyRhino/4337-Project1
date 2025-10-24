@@ -1,4 +1,6 @@
 #lang racket
+(require racket/string)
+
 (define prompt?
    (let [(args (current-command-line-arguments))]
      (cond
@@ -7,12 +9,16 @@
        [(string=? (vector-ref args 0) "--batch") #f]
        [else #t])))
 
+(define (main)
+    (if prompt?
+        (interactive '() '())
+        (batch '() '() 1)))
 
 (define (interactive input-history value-history)
     (begin
         (print-history input-history value-history 1)
-        (displayln "Enter a prefix expression")
-        (let [(expression (read-line))]
+        (display "Enter a prefix expression: ")
+        (let [(expression (string-trim  (read-line)))]
             (if (equal? "quit" expression)
                 (displayln "Quitting program")
                 (let [(result (exc-expr expression value-history))]
@@ -37,7 +43,7 @@
 
 (define (batch input-history value-history i)
 (begin
-        (let [(expression (read-line))]
+        (let [(expression (string-trim (read-line)))]
             (if (equal? "quit" expression)
                 #t
                 (let [(result (exc-expr expression value-history))]
@@ -64,9 +70,6 @@
             (cons #f "Error: $n is out of bounds")))
       (cons #f (format "Error: ~s" tokens))))
 
-
-
-
 (define (tokenize str )
      (join (string->list str) '() "" 0))
 
@@ -82,7 +85,7 @@
             (cond
                 [(op? (first lst))
                      (join (rest lst) (cons (string (first lst)) acc) "" 0)]
-                [(space? (first lst))
+                [(char-whitespace? (first lst))
                      (join (rest lst) acc   "" 0)]
                 [(or (digit? (first lst)) (dollar? (first lst)))
                     (join (rest lst)  acc   (string(first lst)) 1)]
@@ -96,7 +99,7 @@
                  [(op? (first lst))
                     (join (rest lst) (cons (string (first lst)) (cons lastTokens acc)) "" 0)]
                  ; if the current char is an " " then we know the number is over
-                 [(space? (first lst))
+                 [(char-whitespace? (first lst))
                     (join (rest lst) (cons lastTokens acc) "" 0)]
                  [(digit? (first lst))
                     (join (rest lst) acc (string-append lastTokens (string(first lst))) 1)]
@@ -110,7 +113,7 @@
   (char=? c #\$))
 
 (define (space? c)
-  (char=? c #\space))
+  (member c '(#\space #\return)))
 
 (define (op? c)
     (member c '(#\+ #\- #\* #\/)))
@@ -151,7 +154,7 @@
          #f)]
       [else
             (let* ([left (evaluate (left (rest lst)))]
-               [right (evaluate (right (rest lst)))])
+                [right (evaluate (right (rest lst)))])
                 (cond
                     [(or (not left) (not right)) #f]
                     [(equal? (first lst) "+") (+ left right )]
@@ -175,10 +178,13 @@
   (right-helper lst 1))
 
 (define (right-helper lst need)
-  (cond
-    [(zero? need) lst]
-    [(empty? lst) lst]
-    [(member (first lst) '("+" "*" "/"))
-     (right-helper (rest lst) (+ need 1))]
-    [else
-     (right-helper (rest lst) (- need 1))]))
+    (cond
+        [(zero? need) lst]
+        [(empty? lst) lst]
+        [(member (first lst) '("+" "*" "/"))
+            (right-helper (rest lst) (+ need 1))]
+        [else
+            (right-helper (rest lst) (- need 1))]))
+
+
+(main)

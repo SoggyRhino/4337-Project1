@@ -90,7 +90,7 @@ Also the code is just random as i work on things i will clean it up later
 ### (October 23 10pm)
 
 - Thoughts
-  - I've decided that we should just have 2 different functions for each of the modes. WHile 
+  - I've decided that we should just have 2 different functions for each of the modes. While
     this will result in some duplicated code, it doesnt really matter 
     - For now the plan is to have prompt run either interactive or batch
     - Each of those functions will just loop and have history passed as an argument
@@ -100,7 +100,12 @@ Also the code is just random as i work on things i will clean it up later
   - finalize error handling for tokenizer, evaluate, and pre-process 
   - Possibly work on the user input handler
 
-### (October 23 4am)
+ - Random
+   - Found a really hidden bug where one of my wrapper functions was calling cdr on a pair. This was originally something I added 
+    for testing, but it slipped through. Then when i called cdr later i was not getting the second value of the pair but cutting the 
+    first element off the list.
+
+### (October 24 4am)
     
 During the last several hours I have made significant progress towards the completion of the project. I have 
 completed the evaluate function that handles errors and injects history.
@@ -115,7 +120,19 @@ Changed evaluate to now use floating point numbers.
 Completed the interactive and batch mode functions. 
 
 Future plans 
- - Create a "main" function that runs interative or batch based on flags 
+ - Create a "main" function that runs interactive or batch based on flags 
  - Clean up the output to match what is expected in the instructions 
  - Clean up the code, reorder fix comments 
  - Work on a read me
+
+
+
+### (October 24 11am)
+ - Plan to accomplish
+    - Basically I want to finish the code for the project as there's not much left. Just the main and cleaning up the 
+      code.
+
+ - Random
+   - Main was very simple to implement just if prompt?
+   - I was running everything in dr racket, and it was working fine but cmd gives different values on input, now i need to 
+     handle carriage returns and newlines
