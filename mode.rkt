@@ -46,7 +46,7 @@
             (let ([result (evaluate processed-tokens)])
               (if result ;todo fix error
                   (cons #t result)
-                  (cons #f (format "Result: ~s" result))))
+                  (cons #f "Error: Invalid Expression")))
             (cons #f "Error: $n is out of bounds")))
       (cons #f (format "Error: ~s" tokens))))
 
@@ -129,18 +129,21 @@
         [else (get-n n (rest lst) (+ i 1))]))
 
 (define (evaluate lst)
-  (cond
-    [(empty? lst) 0]
-    [(equal? (first lst) "+")
-     (+ (evaluate (left (rest lst)))
-        (evaluate (right (rest lst))))]
-    [(equal? (first lst) "*")
-     (* (evaluate (left (rest lst)))
-        (evaluate (right (rest lst))))]
-    [(equal? (first lst) "/")
-     (/ (evaluate (left (rest lst)))
-        (evaluate (right (rest lst))))]
-    [else (string->number (first lst))]))
+   (cond
+      [(empty? lst) #f]
+      [(string->number (first lst))
+       (if (empty? (rest lst))
+         (string->number (first lst))
+         #f)]
+      [else
+            (let* ([left (evaluate (left (rest lst)))]
+               [right (evaluate (right (rest lst)))])
+                (cond
+                    [(or (not left) (not right)) #f]
+                    [(equal? (first lst) "+") (+ left right )]
+                    [(equal? (first lst) "*") (* left right )]
+                    [(equal? (first lst) "/") (if (zero? right) #f (/ left right ))]
+                    [else #f]))]))
 
 (define (left lst)
   (left-helper lst 1 '()))
@@ -165,6 +168,3 @@
      (right-helper (rest lst) (+ need 1))]
     [else
      (right-helper (rest lst) (- need 1))]))
-
-
-(interactive '() '())
